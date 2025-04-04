@@ -1,87 +1,81 @@
-const data = {
-  Vegeatables: ["Carrot", "Cucumber"],
-  Fruits: [
-    "Apple",
-    "Banana",
-    "Pear",
-    "Watermelon",
-    "Grape",
-    "Strawberry",
-    "Mango",
-    "Blackberry",
-  ],
-  Spices: ["Salt", "Pepper", "Chilli", "Herbs", "Curry"],
-};
+function loadData() {
+  return fetch("./data.json").then((response) => response.json());
+}
 
-// add buttons
-const button_list = document.querySelector(".buttons");
+loadData().then((res) => {
+  let data = res;
 
-Object.entries(data).forEach(([key, value], index) => {
-  let newLi = document.createElement("li");
-  newLi.innerHTML = `(${index + 1}) ${key}`;
+  // add buttons
+  const button_list = document.querySelector(".buttons");
 
-  if (key == "Vegeatables") {
-    newLi.classList.add("clicked");
+  Object.entries(data).forEach(([key, value], index) => {
+    let newLi = document.createElement("li");
+    newLi.id = key;
+    newLi.innerHTML = `(${index + 1}) ${key}`;
+
+    if (index == 0) {
+      newLi.classList.add("clicked");
+    }
+
+    button_list.appendChild(newLi);
+  });
+
+  // add items
+  const item_list = document.querySelector(".item-list");
+
+  for (let item of data[Object.keys(data)[0]]) {
+    let newLi = document.createElement("li");
+    newLi.textContent = item;
+    item_list.appendChild(newLi);
   }
 
-  button_list.appendChild(newLi);
-});
+  // handle item click
+  itemOnClick();
 
-// add items
-const item_list = document.querySelector(".item-list");
+  const buttons = document.querySelectorAll(".buttons li");
 
-for (let item of data["Vegeatables"]) {
-  let new_li = document.createElement("li");
-  new_li.textContent = item;
-  item_list.appendChild(new_li);
-}
+  // add list title
+  const listTitle = document.querySelector(".title");
+  listTitle.innerHTML = `List (${data[Object.keys(data)[0]].length})`;
 
-// handle item click
-itemOnClick();
+  // handle button click event
+  for (let button of buttons) {
+    button.addEventListener("click", () => {
+      let buttonClicked = document.querySelector(".buttons li.clicked");
 
-const buttons = document.querySelectorAll(".buttons li");
-var current_button = "Vegeatables";
-const list_title = document.querySelector(".title");
-list_title.innerHTML = `List (${data[current_button].length})`;
+      // if click another button
+      if (buttonClicked.id !== button.id) {
+        buttonClicked.classList.remove("clicked");
+        button.classList.add("clicked");
+        item_list.replaceChildren();
 
-// handle button click event
-for (let button of buttons) {
-  button.addEventListener("click", () => {
-    let button_clicked = button.innerHTML.split(" ")[1];
+        // add item to item list
+        for (let item of data[button.id]) {
+          let newLi = document.createElement("li");
 
-    // if click another button
-    if (current_button != button_clicked) {
-      current_button = button_clicked;
-      document.querySelector(".buttons li.clicked").classList.remove("clicked");
-      button.classList.add("clicked");
-      item_list.replaceChildren();
+          newLi.textContent = item;
+          item_list.appendChild(newLi);
+        }
 
-      // add item to item list
-      for (let item of data[current_button]) {
-        let new_li = document.createElement("li");
+        // handle item click
+        itemOnClick();
 
-        new_li.textContent = item;
-        item_list.appendChild(new_li);
+        listTitle.innerHTML = `List (${data[button.id].length})`;
       }
-
-      // handle item click
-      itemOnClick();
-
-      list_title.innerHTML = `List (${data[current_button].length})`;
-    }
-  });
-}
-
-function itemOnClick() {
-  let items = document.querySelectorAll(".item-list li");
-
-  for (let item of items) {
-    item.addEventListener("click", () => {
-      let item_clicked = document.querySelector(".item-list li.clicked");
-      if (item_clicked) {
-        item_clicked.classList.remove("clicked");
-      }
-      item.classList.add("clicked");
     });
   }
-}
+
+  function itemOnClick() {
+    let items = document.querySelectorAll(".item-list li");
+
+    for (let item of items) {
+      item.addEventListener("click", () => {
+        let item_clicked = document.querySelector(".item-list li.clicked");
+        if (item_clicked) {
+          item_clicked.classList.remove("clicked");
+        }
+        item.classList.add("clicked");
+      });
+    }
+  }
+});
