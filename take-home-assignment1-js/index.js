@@ -70,12 +70,16 @@ loadData().then((res) => {
 
     for (let item of items) {
       item.addEventListener("click", () => {
-        let item_clicked = document.querySelector(".item-list li.clicked");
-        if (item_clicked) {
-          item_clicked.classList.remove("clicked");
-        }
-        item.classList.add("clicked");
+        itemOnClickHandler(item);
       });
     }
+  }
+
+  function itemOnClickHandler(item) {
+    let item_clicked = document.querySelector(".item-list li.clicked");
+    if (item_clicked) {
+      item_clicked.classList.remove("clicked");
+    }
+    item.classList.add("clicked");
   }
 });
